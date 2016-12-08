@@ -31,8 +31,8 @@ Add-Type @"
        public static extern bool EnableWindow(IntPtr hWnd, bool bEnable);
        [DllImport("user32.dll")]
        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-			 [DllImport("user32.dll")]
-			 public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+       [DllImport("user32.dll")]
+       public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
        [DllImport("user32")]
        [return: MarshalAs(UnmanagedType.Bool)]
@@ -86,7 +86,7 @@ function RefreshWindowList(){
     )
 
     $windowList.Clear()
-		$combobox.Items.Clear()
+    $combobox.Items.Clear()
     foreach ($hWnd in ([APIFuncs]::GetChildWindows([APIFuncs]::GetDesktopWindow())))
     {
             #WindowName
@@ -96,7 +96,7 @@ function RefreshWindowList(){
                 $windowName = "null"
             }
 
-						#ProcessID
+            #ProcessID
             $p = [IntPtr]::Zero
             [void][APIFuncs]::GetWindowThreadProcessId($hWnd, [ref]$p)
             if($processScope){
@@ -106,16 +106,16 @@ function RefreshWindowList(){
               }
             }
             #ProcessName
-						$processName = (Get-Process -ID $p).ProcessName
-						#WindowObject
+            $processName = (Get-Process -ID $p).ProcessName
+            #WindowObject
             $windowObject = New-Object PSObject -Property @{Name=$windowName;Handle=$hWnd;processId=$p;processName=$processName}
             $windowObject | Add-Member ScriptMethod ToString {$this.Name} -force
             [void]$windowList.Add($windowObject)
     }
-		$combobox.Items.AddRange($windowList)
+    $combobox.Items.AddRange($windowList)
 }
 function InitialiseWindowList(){
-	RefreshWindowList
+  RefreshWindowList
 }
 
 $windowHandle = 0
@@ -134,11 +134,11 @@ $combobox_SelectedIndexChanged =
 {
    $windowHandle = $combobox.selectedItem.Handle
    $windowTitle = $combobox.selectedItem.Name
-	 $windowPID = $combobox.selectedItem.processId
-	 $windowProcessName = $combobox.selectedItem.processName
+   $windowPID = $combobox.selectedItem.processId
+   $windowProcessName = $combobox.selectedItem.processName
 
    $windowLabel1.Text = "$windowTitle ($windowHandle)"
-	 $windowLabel2.Text = "$windowPID - $windowProcessName"
+   $windowLabel2.Text = "$windowPID - $windowProcessName"
 }
 
 $combobox.add_SelectedIndexChanged($combobox_SelectedIndexChanged)
@@ -226,11 +226,11 @@ $showAllButton.Location = New-Object System.Drawing.Point(25,225)
 $showAllButton_click = {
   foreach ($hWnd in ([APIFuncs]::GetChildWindows([APIFuncs]::GetDesktopWindow())))
   {
-		$p = [IntPtr]::Zero
-		[void][APIFuncs]::GetWindowThreadProcessId($hWnd, [ref]$p)
-		if ($p -eq $combobox.selectedItem.processId){
-			[APIFuncs]::ShowWindow($hWnd, 1)
-		}
+    $p = [IntPtr]::Zero
+    [void][APIFuncs]::GetWindowThreadProcessId($hWnd, [ref]$p)
+    if ($p -eq $combobox.selectedItem.processId){
+      [APIFuncs]::ShowWindow($hWnd, 1)
+    }
   }
 }
 $showAllButton.Add_Click($showAllButton_click)
